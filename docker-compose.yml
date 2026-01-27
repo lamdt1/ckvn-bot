@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  stock-bot:
+    build: .
+    container_name: stock-alert-bot
+    restart: always
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+    env_file:
+      - .env
+    ports:
+      - "6886:6886"
+    volumes:
+      - ./portfolio.json:/app/portfolio.json
+      # Mount thư mục src để nếu bạn sửa code, bạn chỉ cần restart container thay vì rebuild (tùy chọn)
+      # - ./src:/app/src
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10mb"
+        max-file: "3"
+
+networks:
+  default:
+    name: stock-bot-network

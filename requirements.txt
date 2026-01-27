@@ -1,0 +1,7 @@
+vnstock==0.1.1
+pydantic-settings
+apscheduler
+httpx
+python-dotenv
+pandas
+requests

@@ -1,0 +1,32 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Project specific
+portfolio.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.toast
+.lucid
+.antlr-python-runtime-3.1.3.tar.gz
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
