@@ -1,4 +1,4 @@
-vnstock==0.1.1
+vnstock
 pydantic-settings
 apscheduler
 httpx
