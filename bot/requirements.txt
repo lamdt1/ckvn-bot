@@ -1,0 +1,29 @@
+# Bot Dependencies
+
+# Core dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Data source
+vnstock>=2.0.0  # Vietnamese stock data
+
+# Database
+# sqlite3 is built-in
+
+# Scheduling
+schedule>=1.2.0
+python-dotenv>=1.0.0  # For .env file support
+
+# Notifications (optional)
+python-telegram-bot>=20.0  # Telegram notifications
+httpx>=0.24.0  # For Zalo API calls
+requests>=2.31.0  # For API calls
+
+# Logging
+colorlog>=6.7.0  # Colored logging
+
+# System monitoring (Week 4)
+psutil>=5.9.0  # Resource monitoring for Raspberry Pi
+
+# Testing
+pytest>=7.4.0

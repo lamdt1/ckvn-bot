@@ -1,24 +1,37 @@
-# Sử dụng Python 3.10 slim để nhẹ và an toàn
+# Use Python 3.10 slim for lightweight and secure image
 FROM python:3.10-slim
 
-# Thiết lập thư mục làm việc
+# Set working directory
 WORKDIR /app
 
-# Thiết lập biến môi trường để Python không tạo file .pyc và log output ngay lập tức
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONOPTIMIZE=1
 
-# Cài đặt dependencies hệ thống cần thiết (nếu có)
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements và cài đặt python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements and install Python dependencies
+COPY bot/requirements.txt ./bot/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r bot/requirements.txt
 
-# Copy toàn bộ mã nguồn vào container
+# Copy source code
 COPY . .
 
-# Lệnh chạy bot
-CMD ["python", "main.py"]
+# Create necessary directories
+RUN mkdir -p database logs
+
+# Set proper permissions
+RUN chmod +x bot/main.py
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python3 -c "import sqlite3; sqlite3.connect('database/trading.db').close()" || exit 1
+
+# Run bot in scheduled mode (15:30 daily)
+CMD ["python3", "bot/main.py", "--mode", "scheduled", "--time", "15:30"]

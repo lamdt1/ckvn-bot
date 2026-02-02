@@ -1,0 +1,14 @@
+# Indicator Calculator Dependencies
+
+# Core dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Technical Analysis
+pandas-ta>=0.3.14b0
+
+# Optional: Alternative TA library (faster but harder to install)
+# TA-Lib>=0.4.28
+
+# Data visualization (optional, for debugging)
+matplotlib>=3.7.0
