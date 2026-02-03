@@ -119,6 +119,14 @@ class DataFetcher:
             # Add symbol column
             df['symbol'] = symbol
             
+            # Normalize prices if they are in 'thousands' unit (common in VN stock data)
+            # Threshold: If avg close < 500, assume it's in thousands (e.g., 37.0 instead of 37000)
+            if df['close'].mean() < 500:
+                logger.info(f"  Prices for {symbol} appear to be in thousands unit (e.g., 37). Multiplying by 1000.")
+                cols_to_scale = ['open', 'high', 'low', 'close']
+                for col in cols_to_scale:
+                    df[col] = df[col] * 1000
+            
             # Slice to requested limit if we fetched more
             if len(df) > limit:
                 df = df.iloc[-limit:]
