@@ -620,6 +620,20 @@ class NotificationManager:
         
         return success
 
+    def send_message(self, message: str) -> bool:
+        """Send raw message via all enabled channels"""
+        success = False
+        
+        if self.telegram:
+            # Access internal method _send_message
+            success = self.telegram._send_message(message) or success
+        
+        if self.zalo:
+            # Access internal method _send_message
+            success = self.zalo._send_message(message) or success
+        
+        return success
+
 
 if __name__ == "__main__":
     # Test notification

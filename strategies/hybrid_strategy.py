@@ -98,7 +98,36 @@ class HybridStrategy(ProTraderStrategy):
                 return None
         
         # Step 2: Generate base signal using Pro Trader logic
-        base_signal = super().generate_signal(df, symbol, timeframe, indicators)
+        if df is None or df.empty:
+            return None
+            
+        # Extract latest data for DecisionTree
+        latest = df.iloc[-1]
+        
+        # Get timestamp (handle different formats)
+        timestamp = int(pd.Timestamp.now().timestamp())
+        if 'timestamp' in df.columns:
+            ts_val = latest['timestamp']
+            try:
+                # If it's a pandas Timestamp
+                if hasattr(ts_val, 'timestamp'):
+                    timestamp = int(ts_val.timestamp())
+                # If it's already int/float
+                else:
+                    timestamp = int(ts_val)
+            except:
+                pass
+                
+        price = float(latest['close'])
+        
+        # Call DecisionTree.generate_signal with correct arguments
+        base_signal = super().generate_signal(
+            symbol=symbol,
+            timeframe=timeframe,
+            timestamp=timestamp,
+            price=price,
+            indicators=indicators or {}
+        )
         
         if not base_signal:
             return None

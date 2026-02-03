@@ -60,20 +60,18 @@ class SymbolPerformanceFilter:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
             
-            # Query from signal_performance view
+            # Query from v_symbol_performance view
             cursor.execute("""
                 SELECT 
                     symbol,
-                    total_trades,
-                    winning_trades,
-                    losing_trades,
-                    win_rate,
-                    avg_profit_pct,
-                    total_profit_pct,
-                    max_profit_pct,
-                    max_loss_pct,
-                    avg_hold_days
-                FROM signal_performance
+                    total_signals,
+                    closed_positions,
+                    win_rate_pct,
+                    avg_pnl_pct,
+                    total_pnl_pct,
+                    best_trade_pct,
+                    worst_trade_pct
+                FROM v_symbol_performance
                 WHERE symbol = ?
             """, (symbol,))
             
@@ -83,17 +81,31 @@ class SymbolPerformanceFilter:
             if not row:
                 return None
             
+            # Extract values
+            symbol = row[0]
+            total_signals = row[1]
+            closed_positions = row[2]
+            win_rate = row[3] or 0.0
+            avg_pnl = row[4] or 0.0
+            total_pnl = row[5] or 0.0
+            max_profit = row[6] or 0.0
+            max_loss = row[7] or 0.0
+            
+            # Calculate derived metrics
+            winning_trades = int(closed_positions * (win_rate / 100.0))
+            losing_trades = closed_positions - winning_trades
+            
             return {
-                'symbol': row[0],
-                'total_trades': row[1],
-                'winning_trades': row[2],
-                'losing_trades': row[3],
-                'win_rate': row[4],
-                'avg_profit_pct': row[5],
-                'total_profit_pct': row[6],
-                'max_profit_pct': row[7],
-                'max_loss_pct': row[8],
-                'avg_hold_days': row[9]
+                'symbol': symbol,
+                'total_trades': closed_positions,  # Use closed positions for learning
+                'winning_trades': winning_trades,
+                'losing_trades': losing_trades,
+                'win_rate': win_rate,
+                'avg_profit_pct': avg_pnl,
+                'total_profit_pct': total_pnl,
+                'max_profit_pct': max_profit,
+                'max_loss_pct': max_loss,
+                'avg_hold_days': 0  # Not available in this view
             }
             
         except Exception as e:

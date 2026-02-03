@@ -258,7 +258,7 @@ class TradingBot:
             prices = {}
             for symbol in symbols:
                 try:
-                    df = self.data_fetcher.fetch_data(
+                    df = self.data_fetcher.fetch_historical_data(
                         symbol=symbol,
                         timeframe=self.config.TIMEFRAMES[0],
                         limit=1
