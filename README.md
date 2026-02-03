@@ -32,7 +32,7 @@
 
 ### **1. Clone Repository**
 ```bash
-git clone https://github.com/yourusername/ckbot.git
+git clone https://github.com/lamdt1/ckvn-bot.git
 cd ckbot
 ```
 
@@ -500,3 +500,63 @@ MIT License - see [LICENSE](LICENSE) file for details
 - [Deployment Checklist](DEPLOYMENT_CHECKLIST.md)
 
 **Happy Trading!** 🚀📈
+
+---
+
+## 🐳 Docker Commands & Troubleshooting
+
+Useful commands for managing the bot in a Docker environment.
+
+### **1. Basic Management**
+```bash
+# Start bot in background
+docker compose up -d
+
+# Stop bot
+docker compose down
+
+# Restart bot (apply code changes)
+docker compose restart pro-trader-bot
+
+# Rebuild container (after requirements change)
+docker compose up -d --build
+```
+
+### **2. Monitoring & Logs**
+```bash
+# View real-time logs
+docker logs -f pro-trader-bot
+
+# Check bot status
+docker ps
+
+# Check resource usage
+docker stats pro-trader-bot
+```
+
+### **3. Testing & Manual Execution**
+```bash
+# Run bot manually (one-time)
+docker exec pro-trader-bot python bot/main.py --mode once
+
+# Test notifications
+docker exec pro-trader-bot python test_notifications.py
+
+# Check database integrity (quick health check)
+docker exec pro-trader-bot python -c "import sqlite3; print(sqlite3.connect('database/trading.db').cursor().execute('SELECT count(*) FROM signals').fetchone())"
+```
+
+### **4. Troubleshooting**
+**Issue: "vnstock not installed" or import errors**
+- Cause: Library version mismatch or container outdated.
+- Fix:
+  ```bash
+  docker compose up -d --build
+  ```
+
+**Issue: Bot not sending Telegram messages**
+- Cause: Missing .env config or async/sync code mismatch.
+- Fix: Check `.env` and run `test_notifications.py` inside the container.
+
+**Issue: Timezone wrong in logs**
+- Fix: Ensure `TZ=Asia/Ho_Chi_Minh` is set in `docker-compose.yml`.
