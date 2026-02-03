@@ -19,6 +19,7 @@ from bot.signal_generator import SignalGenerator
 from bot.position_manager import PositionManager
 from bot.notification import NotificationManager
 from bot.portfolio_tracker import PortfolioTracker
+from bot.transaction_manager import TransactionManager
 from strategies.signal import Signal
 
 # Setup logging
@@ -104,8 +105,16 @@ class TradingBot:
                 logger.warning(f"⚠️ Portfolio tracking disabled: {e}")
                 self.portfolio_tracker = None
         else:
-            logger.info("⏸️ Portfolio tracking disabled")
-        
+             logger.info("⏸️ Portfolio tracking disabled")
+
+        # Initialize transaction manager
+        try:
+            self.transaction_manager = TransactionManager(db_path=str(self.config.DATABASE_PATH))
+            logger.info("✅ Transaction manager initialized")
+        except Exception as e:
+            logger.warning(f"⚠️ Transaction manager failed to initialize: {e}")
+            self.transaction_manager = None
+            
         logger.info("✅ Trading Bot initialized")
         self.config.print_config()
     
@@ -288,6 +297,12 @@ class TradingBot:
             
             # Get alerts
             alerts = self.portfolio_tracker.get_alerts(summary)
+            
+            # Check transaction-based alerts
+            if self.transaction_manager:
+                 tx_alerts = self.transaction_manager.check_price_alerts(prices)
+                 alerts.extend(tx_alerts)
+                 
             if alerts:
                 logger.info(f"\n⚠️ {len(alerts)} alerts:")
                 for alert in alerts:

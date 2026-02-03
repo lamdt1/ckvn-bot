@@ -78,7 +78,11 @@ class PortfolioTracker:
         avg_price = position.get('avg_price', 0)
         quantity = position.get('quantity', 0)
         
-        if avg_price == 0 or quantity == 0:
+        if quantity == 0:
+            # Watch-only position
+            return None
+            
+        if avg_price == 0:
             return None
         
         # Calculate P&L

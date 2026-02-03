@@ -499,6 +499,59 @@ MIT License - see [LICENSE](LICENSE) file for details
 - [System Review](SYSTEM_REVIEW.md)
 - [Deployment Checklist](DEPLOYMENT_CHECKLIST.md)
 
+---
+
+## 📒 Quản Lý Giao Dịch Thực Tế (Transaction Tracking)
+
+Hệ thống cho phép bạn lưu lại lịch sử Mua/Bán thực tế để:
+1. Tự động tính giá vốn trung bình (Average Price).
+2. Cảnh báo khi giá giảm sâu hơn giá mua (cơ hội mua thêm).
+3. Cảnh báo khi giá tăng cao hơn giá bán (theo dõi hiệu quả).
+
+### **Cách sử dụng (Thông qua Docker)**
+
+**1. Thêm giao dịch MUA (Add Buy Order)**
+```bash
+# Cú pháp: add [Mã] buy [Số lượng] [Giá]
+docker exec pro-trader-bot python manage_portfolio.py add VNM buy 1000 67000
+```
+
+**2. Thêm giao dịch BÁN (Add Sell Order)**
+```bash
+# Cú pháp: add [Mã] sell [Số lượng] [Giá]
+docker exec pro-trader-bot python manage_portfolio.py add VNM sell 500 70500
+```
+
+**3. Xem lịch sử giao dịch (View History)**
+```bash
+docker exec pro-trader-bot python manage_portfolio.py list
+```
+
+**4. Đồng bộ file cấu hình (Sync Portfolio)**
+Lệnh này sẽ lấy lịch sử giao dịch để tính toán lại file `portfolio.json` (dùng cho bot theo dõi):
+```bash
+docker exec pro-trader-bot python manage_portfolio.py sync
+```
+
+**5. Theo dõi mã (Watchlist)**
+Thêm mã vào danh sách theo dõi (khối lượng = 0) để nhận thông báo giá mà không tính lãi lỗ:
+```bash
+docker exec pro-trader-bot python manage_portfolio.py watch FPT
+```
+
+**6. Hủy theo dõi (Unwatch/Remove)**
+Xóa mã khỏi danh mục hoặc danh sách theo dõi:
+```bash
+docker exec pro-trader-bot python manage_portfolio.py unwatch FPT
+```
+
+### **Cơ chế Cảnh Báo (Smart Alerts)**
+Bot sẽ tự động cảnh báo mỗi khi chạy (`run_once` hoặc `continuous`):
+- **📉 Cảnh báo Mua (DCA):** Nếu giá hiện tại thấp hơn **5%** so với LẦN MUA GẦN NHẤT.
+- **📈 Cảnh báo Bán (Review):** Nếu giá hiện tại cao hơn **5%** so với LẦN BÁN GẦN NHẤT.
+
+---
+
 **Happy Trading!** 🚀📈
 
 ---
