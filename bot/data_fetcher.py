@@ -87,7 +87,7 @@ class DataFetcher:
         try:
             # Try to import vnstock
             try:
-                from vnstock import stock_historical_data
+                from vnstock import Quote
             except ImportError:
                 logger.error("vnstock not installed. Install with: pip install vnstock")
                 return None
@@ -97,19 +97,17 @@ class DataFetcher:
                 end_date = datetime.now().strftime('%Y-%m-%d')
             
             if not start_date:
-                start = datetime.now() - timedelta(days=limit)
+                # Estimate start date based on limit (including weekends)
+                # Multiply by 1.5 to ensure we get enough trading days
+                days_back = int(limit * 1.5)
+                start = datetime.now() - timedelta(days=days_back)
                 start_date = start.strftime('%Y-%m-%d')
             
             logger.info(f"Fetching {symbol} from vnstock ({start_date} to {end_date})...")
             
-            # Fetch data
-            df = stock_historical_data(
-                symbol=symbol,
-                start_date=start_date,
-                end_date=end_date,
-                resolution='1D',
-                type='stock'
-            )
+            # Fetch data using Quote API (vnstock v3)
+            quote = Quote(symbol=symbol, source='VCI')
+            df = quote.history(start=start_date, end=end_date, resolution='1D')
             
             if df is None or df.empty:
                 logger.warning(f"No data returned for {symbol}")
@@ -120,6 +118,10 @@ class DataFetcher:
             
             # Add symbol column
             df['symbol'] = symbol
+            
+            # Slice to requested limit if we fetched more
+            if len(df) > limit:
+                df = df.iloc[-limit:]
             
             logger.info(f"✅ Fetched {len(df)} candles for {symbol}")
             return df

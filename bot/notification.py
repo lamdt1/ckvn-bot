@@ -428,12 +428,24 @@ class TelegramNotifier:
     def _send_message(self, message: str) -> bool:
         """Send message to Telegram"""
         try:
-            self.bot.send_message(
-                chat_id=self.chat_id,
-                text=message,
-                parse_mode='HTML'
+            # Use direct HTTP request instead of async bot wrapper
+            url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+            response = httpx.post(
+                url,
+                json={
+                    "chat_id": self.chat_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                },
+                timeout=10.0
             )
-            return True
+            
+            if response.status_code == 200:
+                return True
+            else:
+                logger.error(f"Telegram API error: {response.text}")
+                return False
+                
         except Exception as e:
             logger.error(f"Failed to send message: {e}")
             return False
